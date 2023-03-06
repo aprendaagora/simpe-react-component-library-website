@@ -56,7 +56,7 @@ const RootPage = () => {
       />
       <div className="flex">
         <Sidemenu menuSections={menuSections} />
-        <main className="p-[50px] flex-1">
+        <main className="p-20 flex-1">
           <Outlet />
         </main>
       </div>
