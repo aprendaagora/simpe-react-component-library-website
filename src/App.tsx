@@ -1,7 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import Table from "./components/Table";
+import {
+  Button,
+  Alert,
+  Input,
+  Heading,
+} from "@aprendaagora/simple-react-component-library";
+import Navbar from "./components/Navbar";
 
 const headers0 = ["Fruit", "Brands", "Country"];
 const table0 = [
@@ -14,6 +21,7 @@ const table0 = [
   [8, "Nestle", "Colombia"],
   [5, "IKEA", "Argentina"],
   [9, "Samsung", "Spain"],
+  [10, "Tik Tok", "Thailand"],
 ];
 
 const headers3 = ["Fruit", "Car", "Country", "Person"];
@@ -49,8 +57,27 @@ const table2 = [
 ];
 
 function App() {
+  const [value, setValue] = useState("");
   return (
     <div className="App">
+      <Navbar
+        Logo={<Button text="Hello" />}
+        routes={[
+          { route: "team", text: "Team" },
+          { route: "about", text: "About" },
+        ]}
+      />
+      <Heading text="this is a heading" level={1} />
+      <Alert text="this is an alert" closeButton={true} />
+      <Button
+        onClick={() => alert("Hello")}
+        type="primary"
+        tailwind=""
+        text="Primary"
+      />
+      <p>{value}</p>
+      <Input value={value} setValue={setValue} placeholder="Hello" />
+
       <Table
         data={table0}
         headers={headers0}

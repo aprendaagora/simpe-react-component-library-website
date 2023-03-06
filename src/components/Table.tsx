@@ -3,14 +3,19 @@ import { FaArrowCircleUp, FaArrowCircleDown } from "react-icons/fa";
 
 interface TableProps {
   data: any[];
+  nItemsPerPage?: number;
   headers?: any[];
   orderingHeaders?: any[];
   tailwind?: string;
 }
 
-const x = 0;
-
-const Table = ({ data, headers, orderingHeaders, tailwind }: TableProps) => {
+const Table = ({
+  data,
+  headers,
+  orderingHeaders,
+  nItemsPerPage = 5,
+  tailwind,
+}: TableProps) => {
   const [sortingHeader, setSortingHeader] = useState("");
   const [sortingIndex, setSortingIndex] = useState<null | number>(null);
   const [ascending, setAscending] = useState(true);
@@ -18,16 +23,48 @@ const Table = ({ data, headers, orderingHeaders, tailwind }: TableProps) => {
   const [filterColumn, setFilterColumn] = useState("");
   const [filterIndex, setFilterIndex] = useState(0);
 
-  const filteredData = filterInput
+  const [pageNumber, setPageNumber] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(nItemsPerPage);
+
+  const filteredData = filterInput.trim()
     ? data.filter((row) =>
         String(row[filterIndex])
           .toLowerCase()
-          .includes(filterInput.toLowerCase())
+          .includes(filterInput.trim().toLowerCase())
       )
     : data;
 
+  const numberOfPages = Math.ceil(filteredData.length / itemsPerPage);
+  const pagesArray = [...Array(numberOfPages).keys()];
+
+  const sortedData =
+    sortingIndex != null
+      ? filteredData.sort((a, b) => {
+          if (ascending) {
+            return a[sortingIndex] < b[sortingIndex]
+              ? -1
+              : a[sortingIndex] > b[sortingIndex]
+              ? 1
+              : 0;
+          } else {
+            return a[sortingIndex] > b[sortingIndex]
+              ? -1
+              : a[sortingIndex] < b[sortingIndex]
+              ? 1
+              : 0;
+          }
+        })
+      : filteredData;
+
+  const page = sortedData.slice(
+    (pageNumber - 1) * itemsPerPage,
+    pageNumber * itemsPerPage
+  );
+
   const sortRows = (header: string, changingSortingHeader: boolean) => {
     console.log("Sort");
+    console.log(data);
+    console.log(filteredData);
     setSortingHeader(header);
     setSortingIndex(orderingHeaders!.findIndex((item) => item === header));
 
@@ -54,99 +91,91 @@ const Table = ({ data, headers, orderingHeaders, tailwind }: TableProps) => {
     <div>
       {Array.isArray(data[0]) ? (
         <>
-          <div className="text-left">
-            <h1>Array of Arrays</h1>
-            <h1>Sorting by: {sortingHeader}</h1>
-            <h1>Sorting Index: {sortingIndex}</h1>
-            <h1>Filtering by: {headers![filterIndex]}</h1>
-            <h1>Ordering headers: {orderingHeaders}</h1>
-          </div>
+          <div className="border pt-4 px-4">
+            <div className="bg-slate-200 flex justify-start p-2">
+              <span className="mr-1">Search by </span>
+              <select onChange={changeFilterColumn}>
+                {headers?.map((header) => (
+                  <option key={header} value={header}>
+                    {header}
+                  </option>
+                ))}
+              </select>
+              <input
+                onChange={filterTable}
+                className="border flex-1 ml-1"
+                type=""
+              />
+            </div>
 
-          <table className={`border ${tailwind}`}>
-            {headers && (
-              <thead className="bg-gray-100">
-                <tr>
-                  {headers.map((header, i) => (
-                    <th className="px-2 py-1" key={i}>
-                      <span className="flex items-center justify-center">
-                        {header}
-                        {orderingHeaders?.includes(header) && (
-                          <button
-                            className={`ml-2
+            <table
+              style={{ tableLayout: "fixed" }}
+              className={`border w-full ${tailwind}`}
+            >
+              {headers && (
+                <thead className="bg-gray-100">
+                  <tr>
+                    {headers.map((header, i) => (
+                      <th className="px-2 py-1" key={i}>
+                        <span className="flex items-center justify-center">
+                          {header}
+                          {orderingHeaders?.includes(header) && (
+                            <button
+                              className={`ml-2
                               ${
                                 sortingHeader === header
-                                  ? "text-blue-500"
+                                  ? "text-blue-700"
                                   : "text-gray-500"
                               }
                             `}
-                            onClick={() =>
-                              sortingHeader === header
-                                ? sortRows(header, false)
-                                : sortRows(header, true)
-                            }
-                          >
-                            {sortingHeader === header ? (
-                              ascending ? (
-                                <FaArrowCircleUp />
+                              onClick={() =>
+                                sortingHeader === header
+                                  ? sortRows(header, false)
+                                  : sortRows(header, true)
+                              }
+                            >
+                              {sortingHeader === header ? (
+                                ascending ? (
+                                  <FaArrowCircleUp />
+                                ) : (
+                                  <FaArrowCircleDown />
+                                )
                               ) : (
-                                <FaArrowCircleDown />
-                              )
-                            ) : (
-                              <FaArrowCircleUp />
-                            )}
-                          </button>
-                        )}
-                      </span>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-            )}
+                                <FaArrowCircleUp />
+                              )}
+                            </button>
+                          )}
+                        </span>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+              )}
 
-            <tbody>
-              {sortingIndex != null
-                ? filteredData
-                    .sort((a, b) => {
-                      if (ascending) {
-                        return a[sortingIndex] < b[sortingIndex]
-                          ? -1
-                          : a[sortingIndex] > b[sortingIndex]
-                          ? 1
-                          : 0;
-                      } else {
-                        return a[sortingIndex] > b[sortingIndex]
-                          ? -1
-                          : a[sortingIndex] < b[sortingIndex]
-                          ? 1
-                          : 0;
-                      }
-                    })
-                    .map((row: any[], i: number) => (
-                      <tr key={i}>
-                        {row.map((cel, j: number) => (
-                          <td key={j}>{cel}</td>
-                        ))}
-                      </tr>
-                    ))
-                : filteredData.map((row: any[], i: number) => (
-                    <tr key={i}>
-                      {row.map((cel, j: number) => (
-                        <td key={j}>{cel}</td>
-                      ))}
-                    </tr>
-                  ))}
-            </tbody>
-          </table>
-          <div className="bg-slate-200 flex justify-start p-2">
-            <span>Search by </span>
-            <select onChange={changeFilterColumn}>
-              {headers?.map((header) => (
-                <option key={header} value={header}>
-                  {header}
-                </option>
+              <tbody>
+                {page.map((row: any[], i: number) => (
+                  <tr key={i}>
+                    {row.map((cel, j: number) => (
+                      <td key={j}>{cel}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="flex justify-center py-2">
+              {pagesArray.map((number) => (
+                <span
+                  className={`px-2 text-blue-500 cursor-pointer hover:underline ${
+                    pageNumber == number + 1 &&
+                    "text-gray-700 cursor-default hover:no-underline"
+                  }`}
+                  onClick={() => setPageNumber(number + 1)}
+                  key={number}
+                >
+                  {number + 1}
+                </span>
               ))}
-            </select>
-            <input onChange={filterTable} className="border" type="" />
+            </div>
           </div>
         </>
       ) : (
