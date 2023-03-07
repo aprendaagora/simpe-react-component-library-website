@@ -17,6 +17,9 @@ const RootPage = () => {
   const moleculesRoutes = [
     { route: "molecules/alert", text: "Alert" },
     { route: "molecules/list", text: "List" },
+    { route: "molecules/card", text: "Card" },
+    { route: "molecules/jumbotron", text: "Jumbotron" },
+    { route: "molecules/collapsible", text: "Collapsible" },
   ];
 
   const organismsRoutes = [
@@ -42,21 +45,22 @@ const RootPage = () => {
     },
   ];
 
-  const navbarRoutes = [
-    { route: "/", text: "Home" },
-    { route: "about", text: "About" },
-  ];
+  const navbarRoutes = [{ route: "/", text: "Home" }];
 
   return (
     <div>
       <Navbar
         routes={navbarRoutes}
-        Logo={<SiReact className="animate-spin-slow" color="white" size={24} />}
+        Logo={
+          <Link to="/">
+            <SiReact className="animate-spin-slow" color="white" size={24} />
+          </Link>
+        }
         renderItem={(item) => <Link to={item.route}>{item.text}</Link>}
       />
       <div className="flex">
         <Sidemenu menuSections={menuSections} />
-        <main className="p-[50px] flex-1">
+        <main className="p-20 flex-1">
           <Outlet />
         </main>
       </div>
