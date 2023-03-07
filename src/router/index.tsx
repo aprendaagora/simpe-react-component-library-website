@@ -16,6 +16,9 @@ import SidemenuPage from "./routes/organisms/SidemenuPage";
 import TablePage from "./routes/organisms/TablePage";
 import AlertPage from "./routes/molecules/AlertPage";
 import ListPage from "./routes/molecules/ListPage";
+import CollapsiblePage from "./routes/molecules/CollapsiblePage";
+import JumbotronPage from "./routes/molecules/JumbotronPage";
+import CardPage from "./routes/molecules/CardPage";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -69,6 +72,18 @@ const router = createBrowserRouter([
           {
             path: "list",
             element: <ListPage />,
+          },
+          {
+            path: "card",
+            element: <CardPage />,
+          },
+          {
+            path: "collapsible",
+            element: <CollapsiblePage />,
+          },
+          {
+            path: "jumbotron",
+            element: <JumbotronPage />,
           },
         ],
       },
